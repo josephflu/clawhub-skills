@@ -6,6 +6,8 @@ filtering by price, condition, and other criteria. Returns structured
 result dicts suitable for scoring and display.
 """
 
+import sys as _sys, os as _os
+_sys.path.insert(0, _os.path.dirname(__file__))
 import os
 from typing import Optional
 import httpx
@@ -122,7 +124,7 @@ def search_items(
         httpx.HTTPStatusError: If the API returns an error status.
     """
     if access_token is None:
-        from src.auth import get_app_access_token
+        from auth import get_app_access_token
         access_token = get_app_access_token()
 
     search_url = _get_search_url()

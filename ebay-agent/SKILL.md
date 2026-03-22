@@ -1,7 +1,8 @@
 ---
 name: ebay-agent
 description: "eBay research agent. Search for deals, compare prices, value items, and track price drops. Uses eBay REST APIs. No eBay account required."
-version: 0.2.0
+version: 0.3.0
+pythonVersion: ">=3.12"
 metadata:
   openclaw:
     emoji: "🛒"
@@ -45,8 +46,8 @@ Search eBay for deals, compare prices across platforms, value items, and track p
 ### `search` — Find items on eBay
 
 ```bash
-ebay-agent search "Sony 85mm f/1.8 lens" --max-price 400 --condition used
-ebay-agent search "iPad Air" --limit 20 --sort price
+uv run --project <skill_dir> python <skill_dir>/scripts/cli.py search "Sony 85mm f/1.8 lens"
+uv run --project <skill_dir> python <skill_dir>/scripts/cli.py search "iPad Air"
 ```
 
 Options: `--max-price/-p`, `--condition/-c`, `--limit/-n`, `--sort/-s` (score/price/seller)
@@ -54,8 +55,8 @@ Options: `--max-price/-p`, `--condition/-c`, `--limit/-n`, `--sort/-s` (score/pr
 ### `value` — Estimate what an item is worth
 
 ```bash
-ebay-agent value "iPad Air 2 64GB" --condition good
-ebay-agent value "Sony 85mm f/1.8 lens" --limit 30
+uv run --project <skill_dir> python <skill_dir>/scripts/cli.py value "iPad Air 2 64GB"
+uv run --project <skill_dir> python <skill_dir>/scripts/cli.py value "Sony 85mm f/1.8 lens"
 ```
 
 Returns average, median, min, max, listing count, and a recommended price based on current market data.
@@ -101,8 +102,7 @@ ebay-agent watch remove abc123
 ### `prefs` — View or update search preferences
 
 ```bash
-ebay-agent prefs
-ebay-agent prefs --strategy price --budget 300 --min-condition very_good
+uv run --project <skill_dir> python <skill_dir>/scripts/cli.py prefs
 ```
 
 ## Required Environment Variables
