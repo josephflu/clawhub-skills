@@ -52,12 +52,21 @@ python <skill_dir>/scripts/check.py --brainstorm "<description>"
 
 Requires `OPENROUTER_API_KEY` env var. If not set, inform the user and fall back to checking a name they suggest manually.
 
+### JSON output (for scripting / agent use)
+
+```bash
+python <skill_dir>/scripts/check.py <name> --json
+```
+
+Returns structured JSON — no ANSI, suitable for piping or parsing by other agents.
+
 ### Display output
 
-Display the script output as-is — Rich handles the terminal formatting (tables, colors). If running in a non-TTY context, pipe output through `cat` to strip ANSI if needed.
+Display the script output as-is — Rich handles the terminal formatting (tables, colors).
 
 ## Notes
 
 - DNS check timeout: 3 seconds per domain
 - Unknown = DNS timed out or inconclusive; not necessarily available
 - Registration links go to Namecheap search
+- TLD reference (costs, descriptions): `references/tlds.md`

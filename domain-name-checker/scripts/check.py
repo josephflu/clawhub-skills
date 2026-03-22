@@ -28,7 +28,7 @@ console = Console()
 DEFAULT_TLDS = [".com", ".net", ".org", ".io", ".ai", ".co", ".app", ".dev", ".xyz"]
 
 PREFIXES = ["get", "use", "try", "go", "my"]
-SUFFIXES = ["app", "hq", "ai", "io"]
+SUFFIXES = ["hq", "hub", "lab", "pro"]
 
 
 def dns_check(domain: str, timeout: int = 3) -> str:
@@ -66,22 +66,6 @@ def dns_check(domain: str, timeout: int = 3) -> str:
     except Exception:
         return "unknown"
 
-
-def whois_check(domain: str) -> str | None:
-    """Optional whois cross-check. Returns 'available', 'taken', or None if whois unavailable."""
-    try:
-        result = subprocess.run(
-            ["whois", domain],
-            capture_output=True, text=True, timeout=8
-        )
-        output = result.stdout.lower()
-        if any(x in output for x in ["no match", "not found", "no entries found", "available", "status: free"]):
-            return "available"
-        if any(x in output for x in ["registrar:", "registrant:", "creation date:", "registered on"]):
-            return "taken"
-        return None
-    except Exception:
-        return None
 
 
 def check_domain(domain: str) -> tuple[str, str]:
@@ -190,7 +174,31 @@ def main():
     parser = argparse.ArgumentParser(description="domain-name-checker: check domain availability")
     parser.add_argument("names", nargs="*", help="Domain name(s) or full domains to check")
     parser.add_argument("--brainstorm", metavar="DESCRIPTION", help="Brainstorm names from a description (requires OPENROUTER_API_KEY)")
+    parser.add_argument("--json", action="store_true", help="Output results as JSON (no ANSI, for scripting/agents)")
     args = parser.parse_args()
+
+    if args.json:
+        # JSON output mode — strip Rich console, output raw JSON
+        import json
+        global console
+        console = Console(no_color=True, highlight=False)
+
+        all_results = {}
+        if args.brainstorm:
+            names = brainstorm_names(args.brainstorm)
+            for name in names:
+                results = check_name(name)
+                all_results[name] = {d: s for d, s in results}
+        else:
+            for raw in args.names:
+                raw = raw.lower().strip()
+                if "." in raw:
+                    results = check_full_domain(raw)
+                else:
+                    results = check_name(raw)
+                all_results[raw] = {d: s for d, s in results}
+        print(json.dumps(all_results, indent=2))
+        return
 
     if args.brainstorm:
         console.print(f"\n[bold cyan]🧠 Brainstorming names for:[/bold cyan] {args.brainstorm}\n")
