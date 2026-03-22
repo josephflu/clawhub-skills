@@ -1,7 +1,7 @@
 ---
 name: domain-name-checker
 description: "Check domain availability and brainstorm names. Checks .com/.net/.org/.io/.ai/.co/.app/.dev and more. Suggests alternatives when taken. No API key required."
-version: 0.1.1
+version: 1.0.1
 metadata:
   openclaw:
     emoji: "🌐"
