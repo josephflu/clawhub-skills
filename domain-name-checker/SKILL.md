@@ -1,7 +1,7 @@
 ---
 name: domain-name-checker
 description: "Check domain availability and brainstorm names. Checks .com/.net/.org/.io/.ai/.co/.app/.dev and more. Suggests alternatives when taken. No API key required."
-version: 0.1.0
+version: 0.1.1
 metadata:
   openclaw:
     emoji: "🌐"
@@ -52,21 +52,12 @@ python <skill_dir>/scripts/check.py --brainstorm "<description>"
 
 Requires `OPENROUTER_API_KEY` env var. If not set, inform the user and fall back to checking a name they suggest manually.
 
-### JSON output (for scripting / agent use)
-
-```bash
-python <skill_dir>/scripts/check.py <name> --json
-```
-
-Returns structured JSON — no ANSI, suitable for piping or parsing by other agents.
-
 ### Display output
 
-Display the script output as-is — Rich handles the terminal formatting (tables, colors).
+Display the script output as-is — Rich handles the terminal formatting (tables, colors). If running in a non-TTY context, pipe output through `cat` to strip ANSI if needed.
 
 ## Notes
 
 - DNS check timeout: 3 seconds per domain
 - Unknown = DNS timed out or inconclusive; not necessarily available
 - Registration links go to Namecheap search
-- TLD reference (costs, descriptions): `references/tlds.md`
