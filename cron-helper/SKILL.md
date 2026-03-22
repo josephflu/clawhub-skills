@@ -1,5 +1,5 @@
 ---
-name: cron-helper
+name: eagerbots-cron-helper
 description: "Explain, generate, and validate cron expressions. Convert plain English schedules to cron syntax and back. Show next run times. Works with standard 5-field and 6-field (with seconds) cron."
 version: 1.0.0
 metadata:
