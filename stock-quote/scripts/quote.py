@@ -24,20 +24,38 @@ HEADERS = {
 
 
 def fetch_quote(ticker: str) -> dict | None:
-    url = (
-        f"https://query1.finance.yahoo.com/v10/finance/quoteSummary/{ticker}"
-        f"?modules=price,summaryDetail"
-    )
+    url = f"https://query1.finance.yahoo.com/v8/finance/chart/{ticker}?interval=1d&range=5d"
     try:
         r = httpx.get(url, headers=HEADERS, timeout=10, follow_redirects=True)
         r.raise_for_status()
         data = r.json()
-        result = data.get("quoteSummary", {}).get("result")
+        result = data.get("chart", {}).get("result")
         if not result:
             return None
-        price_data = result[0].get("price", {})
-        summary = result[0].get("summaryDetail", {})
-        return {"price": price_data, "summary": summary}
+        meta = result[0].get("meta", {})
+        # Map meta fields to expected price/summary structure
+        price = {
+            "shortName": meta.get("shortName") or meta.get("instrumentType", ticker),
+            "exchangeName": meta.get("exchangeName", ""),
+            "regularMarketPrice": meta.get("regularMarketPrice"),
+            "regularMarketPreviousClose": meta.get("previousClose") or meta.get("chartPreviousClose"),
+            "regularMarketChange": (meta.get("regularMarketPrice", 0) or 0) - (meta.get("previousClose") or meta.get("chartPreviousClose") or meta.get("regularMarketPrice") or 0),
+            "regularMarketChangePercent": 0,
+            "regularMarketVolume": meta.get("regularMarketVolume"),
+            "marketCap": meta.get("marketCap"),
+            "marketState": meta.get("marketState", "CLOSED"),
+        }
+        prev = meta.get("previousClose") or meta.get("chartPreviousClose")
+        cur = meta.get("regularMarketPrice")
+        if prev and cur and prev != 0:
+            price["regularMarketChange"] = cur - prev
+            price["regularMarketChangePercent"] = (cur - prev) / prev
+        summary = {
+            "fiftyTwoWeekHigh": meta.get("fiftyTwoWeekHigh"),
+            "fiftyTwoWeekLow": meta.get("fiftyTwoWeekLow"),
+            "averageVolume": meta.get("averageVolume") or meta.get("regularMarketVolume"),
+        }
+        return {"price": price, "summary": summary}
     except httpx.HTTPStatusError:
         return None
     except Exception:

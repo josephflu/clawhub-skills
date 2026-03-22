@@ -1,5 +1,5 @@
 ---
-name: stock-quote
+name: eagerbots-stock-quote
 description: "Get real-time stock, ETF, and crypto prices. Compare tickers, check market cap and volume. Uses Yahoo Finance — no API key required."
 version: 1.0.0
 metadata:
