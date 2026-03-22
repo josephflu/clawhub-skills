@@ -1,4 +1,9 @@
-# ClawHub Skill Package — ebay-agent
+# ebay-agent
+
+> ⚠️ **Alpha — Work in Progress**
+> This skill is functional but early. Requires a free eBay Developer API key to use. Expect rough edges. Feedback welcome — open an issue on [GitHub](https://github.com/josephflu/clawhub-skills).
+
+---
 
 This directory contains the ClawHub publish-ready version of the ebay-agent skill.
 

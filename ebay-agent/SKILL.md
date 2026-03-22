@@ -1,7 +1,7 @@
 ---
 name: ebay-agent
 description: "eBay research agent. Search for deals, compare prices, value items, and track price drops. Uses eBay REST APIs. No eBay account required."
-version: 0.3.0
+version: 0.3.1
 pythonVersion: ">=3.12"
 metadata:
   openclaw:
