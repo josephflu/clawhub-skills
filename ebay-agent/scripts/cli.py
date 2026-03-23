@@ -27,9 +27,12 @@ def cmd_search(args):
             condition=args.condition,
             limit=args.limit,
         )
+        if not items:
+            print("No results found on eBay.")
+            return
         ranked = rank_results(items, prefs)
         if not ranked:
-            print("No results found.")
+            print(f"Found {len(items)} listings but all filtered out by preferences (min seller score: {prefs.min_seller_score}%, min condition: {prefs.min_condition}). Try: ebay-agent prefs")
             return
 
         # Apply sort override
@@ -67,18 +70,21 @@ def cmd_search(args):
 def cmd_value(args):
     from .valuation import get_valuation
 
+    from .valuation import CONDITION_ADJUSTMENTS
+
     try:
         result = get_valuation(args.query, condition=args.condition, limit=args.limit)
         if result["count"] == 0:
             print(f"No results found for '{args.query}'.")
             return
+        adj_pct = CONDITION_ADJUSTMENTS.get(args.condition.lower(), 0.8)
         print(f"Valuation for '{args.query}' (condition: {args.condition}):")
         print(f"  Average:           ${result['avg']:.2f}")
         print(f"  Median:            ${result['median']:.2f}")
         print(f"  Range:             ${result['min']:.2f} - ${result['max']:.2f}")
         print(f"  Listings analyzed: {result['count']}")
         print(f"  Source:            {result['source']}")
-        print(f"  Condition adj:     {args.condition} ({result['adjusted_avg']:.2f})")
+        print(f"  Condition adj:     {args.condition} ({adj_pct:.0%} of avg = ${result['adjusted_avg']:.2f})")
         print(f"  Recommended price: ${result['recommended_price']:.2f}")
     except Exception as e:
         print(f"Valuation failed: {e}")
