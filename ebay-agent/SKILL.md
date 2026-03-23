@@ -82,11 +82,13 @@ Shows current scoring preferences: min condition, min seller score, budget, stra
 | `EBAY_CERT_ID` | Yes | eBay app client secret from developer.ebay.com |
 | `EBAY_ENVIRONMENT` | No | `sandbox` or `production` (default: production) |
 
+Credentials can be set as environment variables or in a `.env` file in the skill directory (loaded automatically via `python-dotenv`).
+
 ### How to get eBay credentials
 
 1. Go to [developer.ebay.com](https://developer.ebay.com) and create a free account
 2. Create an application to get your App ID and Cert ID
-3. Set `EBAY_APP_ID` and `EBAY_CERT_ID` in your environment
+3. Set `EBAY_APP_ID` and `EBAY_CERT_ID` in your environment or in a `.env` file
 
 ## Example workflow
 
