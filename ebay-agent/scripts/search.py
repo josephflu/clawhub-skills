@@ -129,7 +129,7 @@ def search_items(
     params: dict = {
         "q": query,
         "limit": limit,
-        "sort": "price",
+        "sort": "bestMatch",
     }
 
     filter_str = _build_filter(max_price, condition)
