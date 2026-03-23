@@ -12,10 +12,14 @@ CONDITION_SCORES: dict[str, float] = {
     "New": 1.0,
     "New other (see details)": 0.9,
     "New without tags": 0.9,
+    "Open box": 0.85,
     "Certified - Refurbished": 0.85,
-    "Seller refurbished": 0.75,
     "Excellent - Refurbished": 0.8,
+    "Seller refurbished": 0.75,
     "Very Good": 0.7,
+    "Like New": 0.7,
+    "Used": 0.6,
+    "Pre-owned": 0.6,
     "Good": 0.55,
     "Acceptable": 0.35,
     "For parts or not working": 0.0,
@@ -92,7 +96,7 @@ def rank_results(items: list[dict], prefs: UserPreferences) -> list[dict]:
             continue
 
         feedback = item.get("seller_feedback_pct")
-        if feedback and float(feedback) < prefs.min_seller_score:
+        if feedback and float(feedback) > 0 and float(feedback) < prefs.min_seller_score:
             continue
 
         item["score"] = round(score_listing(item, prefs), 3)
