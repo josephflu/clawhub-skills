@@ -1,7 +1,7 @@
 ---
 name: ebay-agent
 description: "eBay research agent. Search for deals, value items, and compare prices using eBay REST APIs. No eBay account required — just a free developer API key."
-version: 0.4.2
+version: 0.5.0
 pythonVersion: ">=3.12"
 metadata:
   openclaw:
@@ -51,7 +51,7 @@ ebay-agent search "iPad Air" --max-price 300 --condition used
 ebay-agent search "Nintendo Switch" --sort price --limit 20
 ```
 
-Options: `--max-price/-p`, `--condition/-c` (new, used, very_good, good, acceptable), `--limit/-n` (default: 10), `--sort/-s` (score, price, seller)
+Options: `--max-price/-p`, `--condition/-c` (new, used, very_good, good, acceptable), `--limit/-n` (default: 10), `--sort/-s` (score, price, seller), `--json`
 
 ### `value` — Estimate what an item is worth
 
@@ -62,7 +62,7 @@ ebay-agent value "Sony 85mm f/1.8 lens" --condition very_good --limit 30
 
 Returns average, median, min, max, listing count, and a recommended price based on current market data. Tries eBay Marketplace Insights (sold data) first, falls back to Browse API (active listings).
 
-Options: `--condition/-c` (default: used), `--limit/-n` (default: 20)
+Options: `--condition/-c` (default: used), `--limit/-n` (default: 20), `--json`
 
 ### `prefs` — View search preferences
 

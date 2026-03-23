@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import json
 
 
 def cmd_search(args):
@@ -40,6 +41,10 @@ def cmd_search(args):
             ranked.sort(key=lambda x: x["total_price"])
         elif args.sort == "seller":
             ranked.sort(key=lambda x: float(x.get("seller_feedback_pct") or 0), reverse=True)
+
+        if args.json:
+            print(json.dumps(ranked[:args.limit], indent=2))
+            return
 
         try:
             from rich.table import Table
@@ -77,6 +82,9 @@ def cmd_value(args):
         if result["count"] == 0:
             print(f"No results found for '{args.query}'.")
             return
+        if args.json:
+            print(json.dumps(result, indent=2))
+            return
         adj_pct = CONDITION_ADJUSTMENTS.get(args.condition.lower(), 0.8)
         print(f"Valuation for '{args.query}' (condition: {args.condition}):")
         print(f"  Average:           ${result['avg']:.2f}")
@@ -108,11 +116,13 @@ def main():
     p_search.add_argument("--condition", "-c", default=None, help="Condition: new, used, very_good, good, acceptable")
     p_search.add_argument("--limit", "-n", type=int, default=10, help="Number of results (default: 10)")
     p_search.add_argument("--sort", "-s", choices=["score", "price", "seller"], default="score", help="Sort order (default: score)")
+    p_search.add_argument("--json", action="store_true", help="Output results as JSON")
 
     p_value = subparsers.add_parser("value", help="Get market valuation")
     p_value.add_argument("query", help="Item to value")
     p_value.add_argument("--condition", "-c", default="used", help="Condition (default: used)")
     p_value.add_argument("--limit", "-n", type=int, default=20, help="Listings to analyze (default: 20)")
+    p_value.add_argument("--json", action="store_true", help="Output results as JSON")
 
     subparsers.add_parser("prefs", help="Show current preferences")
 
