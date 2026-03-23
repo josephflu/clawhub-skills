@@ -5,9 +5,7 @@ Ranks listings by a weighted combination of price savings, seller trust,
 shipping speed, and item condition relative to user preferences.
 """
 
-import sys, os
-sys.path.insert(0, os.path.dirname(__file__))
-from preferences import UserPreferences
+from .preferences import UserPreferences
 
 # Maps condition strings (from eBay API) to a 0-1 quality scale
 CONDITION_SCORES: dict[str, float] = {

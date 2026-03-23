@@ -5,8 +5,6 @@ Provides get_valuation() to estimate item market value based on
 current/recent eBay listings, with condition-based price adjustment.
 """
 
-import sys as _sys, os as _os
-_sys.path.insert(0, _os.path.dirname(__file__))
 import os
 import statistics
 from typing import Optional
@@ -73,7 +71,7 @@ def _browse_api_prices(
     query: str, limit: int, access_token: str
 ) -> list[float]:
     """Get current listing prices from Browse API search."""
-    from search import search_items
+    from .search import search_items
 
     items = search_items(
         query, limit=limit, access_token=access_token
@@ -109,7 +107,7 @@ def get_valuation(
         EnvironmentError: If credentials are missing and no token provided.
     """
     if token is None:
-        from auth import get_app_access_token
+        from .auth import get_app_access_token
         token = get_app_access_token()
 
     # Try Marketplace Insights first

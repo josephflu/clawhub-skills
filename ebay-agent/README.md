@@ -1,43 +1,45 @@
 # ebay-agent
 
-> ⚠️ **Alpha — Work in Progress**
-> This skill is functional but early. Requires a free eBay Developer API key to use. Expect rough edges. Feedback welcome — open an issue on [GitHub](https://github.com/josephflu/clawhub-skills).
+> **Alpha — Work in Progress**
+> This skill is functional but early. Requires a free eBay Developer API key. Feedback welcome — open an issue on [GitHub](https://github.com/josephflu/clawhub-skills).
 
----
+eBay research agent for [OpenClaw](https://openclaw.ai). Search for deals, estimate item values, and rank results by price, seller trust, and condition.
 
-This directory contains the ClawHub publish-ready version of the ebay-agent skill.
-
-## Relationship to the prototype
-
-- `src/` — The full CLI prototype (uses typer, rich, etc.)
-- `skill/` — The packaged skill for ClawHub (scripts + references + SKILL.md)
-
-The `skill/scripts/` files are copies of `src/` modules. Before publishing, run the publish script to sync the latest source.
+Published as **eagerbots/ebay-agent** on [ClawHub](https://clawhub.ai).
 
 ## Directory structure
 
 ```
-skill/
-├── SKILL.md              # Skill manifest with frontmatter
-├── scripts/              # Python modules copied from src/
-│   ├── auth.py
-│   ├── search.py
-│   ├── scoring.py
-│   ├── preferences.py
-│   ├── valuation.py
-│   └── listing_gen.py
+ebay-agent/
+├── SKILL.md              # Skill manifest with frontmatter + agent instructions
+├── pyproject.toml        # Python project config (dependencies, entry point)
+├── scripts/              # Python package
+│   ├── __init__.py
+│   ├── cli.py            # CLI entry point (argparse)
+│   ├── auth.py           # eBay OAuth client credentials
+│   ├── search.py         # Browse API search
+│   ├── valuation.py      # Market valuation via Insights + Browse APIs
+│   ├── scoring.py        # Result ranking by price/trust/condition
+│   └── preferences.py    # User preferences (~/.ebay-agent/preferences.json)
 └── references/           # Knowledge packs for the agent
-    ├── ebay-selling-guide.md
+    ├── ebay-api-cheatsheet.md
     ├── ebay-scam-detection.md
-    └── ebay-api-cheatsheet.md
+    └── ebay-selling-guide.md
 ```
+
+## Quick start
+
+```bash
+clawhub install eagerbots/ebay-agent
+export EBAY_APP_ID=your_app_id
+export EBAY_CERT_ID=your_cert_id
+```
+
+Then ask your agent: "Search eBay for Sony 85mm lens under $400"
 
 ## Publishing
 
-Publish under the **EagerBots** account (not josephflu):
-
 ```bash
-bash scripts/publish_skill.sh   # syncs src/ -> skill/scripts/ first
-clawhub login                   # login as EagerBots
-clawhub publish ./skill --slug ebay-agent --version 0.1.0
+clawhub login
+clawhub publish ./ebay-agent --slug ebay-agent
 ```
