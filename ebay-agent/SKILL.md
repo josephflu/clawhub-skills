@@ -21,9 +21,11 @@ metadata:
           - uv
         label: "Install uv (Python package manager)"
       - id: pip
-        kind: download
-        url: https://astral.sh/uv/install.sh
-        label: "Install uv via installer script (curl | sh)"
+        kind: pip
+        package: uv
+        bins:
+          - uv
+        label: "Install uv via pip (pip install uv)"
     homepage: https://github.com/josephflu/clawhub-skills
 ---
 
