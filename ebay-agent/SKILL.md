@@ -1,7 +1,7 @@
 ---
 name: ebay-agent
 description: "eBay research agent. Search for deals, value items, and compare prices using eBay REST APIs. No eBay account required — just a free developer API key."
-version: 0.4.1
+version: 0.4.2
 pythonVersion: ">=3.12"
 metadata:
   openclaw:
