@@ -78,7 +78,7 @@ Shows current scoring preferences: min condition, min seller score, budget, stra
 |----------|----------|-------------|
 | `EBAY_APP_ID` | Yes | eBay app client ID from developer.ebay.com |
 | `EBAY_CERT_ID` | Yes | eBay app client secret from developer.ebay.com |
-| `EBAY_ENVIRONMENT` | No | `sandbox` or `production` (default: sandbox) |
+| `EBAY_ENVIRONMENT` | No | `sandbox` or `production` (default: production) |
 
 ### How to get eBay credentials
 

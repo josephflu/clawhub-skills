@@ -34,7 +34,7 @@ def _get_search_url() -> str:
     Returns:
         Search URL string (sandbox or production)
     """
-    env = os.getenv("EBAY_ENVIRONMENT", "sandbox").lower()
+    env = os.getenv("EBAY_ENVIRONMENT", "production").lower()
     return SANDBOX_BASE_URL if env == "sandbox" else PRODUCTION_BASE_URL
 
 

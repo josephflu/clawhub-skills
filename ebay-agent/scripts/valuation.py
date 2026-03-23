@@ -29,7 +29,7 @@ PRODUCTION_INSIGHTS_URL = "https://api.ebay.com/buy/marketplace_insights/v1/item
 
 
 def _get_insights_url() -> str:
-    env = os.getenv("EBAY_ENVIRONMENT", "sandbox").lower()
+    env = os.getenv("EBAY_ENVIRONMENT", "production").lower()
     return SANDBOX_INSIGHTS_URL if env == "sandbox" else PRODUCTION_INSIGHTS_URL
 
 

@@ -44,7 +44,7 @@ def _get_credentials() -> tuple[str, str]:
 
 def _get_token_url() -> str:
     """Return the appropriate OAuth token endpoint based on EBAY_ENVIRONMENT."""
-    env = os.getenv("EBAY_ENVIRONMENT", "sandbox").lower()
+    env = os.getenv("EBAY_ENVIRONMENT", "production").lower()
     return SANDBOX_TOKEN_URL if env == "sandbox" else PRODUCTION_TOKEN_URL
 
 
