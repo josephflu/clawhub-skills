@@ -1,15 +1,11 @@
 """
 User preferences for eBay search scoring and filtering.
 
-Loads/saves preferences from ~/.ebay-agent/preferences.json.
+Returns default preferences. Future versions may support persistent
+preferences via environment variables or skill configuration.
 """
 
-import json
-from dataclasses import dataclass, field, asdict
-from pathlib import Path
-
-PREFS_DIR = Path.home() / ".ebay-agent"
-PREFS_FILE = PREFS_DIR / "preferences.json"
+from dataclasses import dataclass
 
 
 @dataclass
@@ -23,14 +19,5 @@ class UserPreferences:
 
 
 def load_preferences() -> UserPreferences:
-    """Load preferences from disk, or return defaults if none saved."""
-    if PREFS_FILE.exists():
-        data = json.loads(PREFS_FILE.read_text())
-        return UserPreferences(**{k: v for k, v in data.items() if k in UserPreferences.__dataclass_fields__})
+    """Return default preferences."""
     return UserPreferences()
-
-
-def save_preferences(prefs: UserPreferences) -> None:
-    """Save preferences to ~/.ebay-agent/preferences.json."""
-    PREFS_DIR.mkdir(parents=True, exist_ok=True)
-    PREFS_FILE.write_text(json.dumps(asdict(prefs), indent=2) + "\n")
