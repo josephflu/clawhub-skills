@@ -52,22 +52,26 @@ def cmd_search(args):
             console = Console()
             table = Table(title=f"Search: {args.query}")
             table.add_column("#", style="dim", width=3)
-            table.add_column("Title", max_width=40)
+            table.add_column("Title", max_width=38)
             table.add_column("Price", justify="right")
             table.add_column("Condition")
             table.add_column("Score", justify="right")
+            table.add_column("Link", style="dim blue")
             for i, item in enumerate(ranked[:args.limit], 1):
+                url = item.get("item_url", "")
                 table.add_row(
                     str(i),
-                    item.get("title", "")[:40],
+                    item.get("title", "")[:38],
                     f"${item.get('total_price', 0):.2f}",
                     item.get("condition", ""),
                     str(item.get("score", "")),
+                    f"[link={url}]view[/link]" if url else "",
                 )
             console.print(table)
         except ImportError:
             for i, item in enumerate(ranked[:args.limit], 1):
-                print(f"{i}. {item.get('title', '')[:50]} | ${item.get('total_price', 0):.2f} | score={item.get('score', '')}")
+                url = item.get("item_url", "")
+                print(f"{i}. {item.get('title', '')[:50]} | ${item.get('total_price', 0):.2f} | {url}")
     except Exception as e:
         print(f"Search failed: {e}")
 

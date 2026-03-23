@@ -10,6 +10,8 @@ from .preferences import UserPreferences
 # Maps condition strings (from eBay API) to a 0-1 quality scale
 CONDITION_SCORES: dict[str, float] = {
     "New": 1.0,
+    "New with box": 1.0,
+    "New without box": 0.95,
     "New other (see details)": 0.9,
     "New without tags": 0.9,
     "Open box": 0.85,
