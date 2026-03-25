@@ -1,7 +1,7 @@
 ---
 name: ebay-agent
 description: "eBay research agent. Search for deals, evaluate prices, and get fair value estimates using eBay REST APIs. No eBay account required — just a free developer API key."
-version: 0.6.0
+version: 0.6.1
 pythonVersion: ">=3.12"
 metadata:
   openclaw:
@@ -77,6 +77,28 @@ ebay-agent deal "Nintendo Switch OLED" --price 280
 Fetches comparable listings, filters out accessories and irrelevant results, computes a fair value range, and tells you whether to buy. With `--price`, rates a specific price as great deal / good deal / fair / overpriced.
 
 Options: `--condition/-c` (default: used), `--price/-p` (evaluate a specific price), `--limit/-n` (default: 25), `--json`
+
+### `watch` — Save searches and check for deals
+
+```bash
+# Add a watch (--max-price is required)
+ebay-agent watch add "Sony FE 85mm f/1.8" --max-price 300 --condition used
+
+# List active watches
+ebay-agent watch list
+
+# Remove a watch by ID
+ebay-agent watch remove sony-fe-85-a1b2
+
+# Check all watches against live eBay data
+ebay-agent watch check
+```
+
+Watches are stored in `~/.ebay-agent/watches.json`. Override with `--state-file <path>` on any watch subcommand.
+
+`watch check` searches eBay for each saved query, filters for relevance, and reports any listing at or below your max price. No built-in scheduler — run `watch check` manually or via cron.
+
+Options: `--max-price/-p` (required on add), `--condition/-c` (default: used), `--state-file`
 
 ### `prefs` — View search preferences
 

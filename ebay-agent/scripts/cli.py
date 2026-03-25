@@ -7,6 +7,10 @@ Usage:
     uv run --project <skill_dir> ebay-agent value "iPhone 15 Pro"
     uv run --project <skill_dir> ebay-agent deal "Sony FE 85mm f/1.8"
     uv run --project <skill_dir> ebay-agent prefs
+    uv run --project <skill_dir> ebay-agent watch add "Sony FE 85mm f/1.8" --max-price 300
+    uv run --project <skill_dir> ebay-agent watch list
+    uv run --project <skill_dir> ebay-agent watch remove <id>
+    uv run --project <skill_dir> ebay-agent watch check
 """
 
 import argparse
@@ -159,6 +163,68 @@ def cmd_prefs(args):
         print(f"  {k}: {v}")
 
 
+def cmd_watch(args):
+    from .watch import add_watch, list_watches, remove_watch, check_watches
+
+    state_file = getattr(args, "state_file", None)
+
+    if args.watch_command == "add":
+        watch = add_watch(args.query, args.max_price, condition=args.condition, state_file=state_file)
+        print(f"Added watch '{watch['id']}' for \"{watch['query']}\" (condition: {watch['condition']}, max: ${watch['max_price']:.2f})")
+
+    elif args.watch_command == "list":
+        watches = list_watches(state_file)
+        if not watches:
+            print("No active watches.")
+            return
+        try:
+            from rich.table import Table
+            from rich.console import Console
+            console = Console()
+            table = Table(title="Watches")
+            table.add_column("ID", style="dim")
+            table.add_column("Query")
+            table.add_column("Condition")
+            table.add_column("Max Price", justify="right")
+            table.add_column("Last Checked", style="dim")
+            table.add_column("Best Price", justify="right")
+            for w in watches:
+                checked = w.get("last_checked_at") or "never"
+                best = f"${w['last_best_price']:.2f}" if w.get("last_best_price") is not None else "-"
+                table.add_row(w["id"], w["query"], w.get("condition", ""), f"${w['max_price']:.2f}", checked, best)
+            console.print(table)
+        except ImportError:
+            for w in watches:
+                checked = w.get("last_checked_at") or "never"
+                best = f"${w['last_best_price']:.2f}" if w.get("last_best_price") is not None else "-"
+                print(f"  {w['id']} | {w['query']} | {w.get('condition', '')} | max ${w['max_price']:.2f} | checked {checked} | best {best}")
+
+    elif args.watch_command == "remove":
+        if remove_watch(args.id, state_file):
+            print(f"Removed watch '{args.id}'.")
+        else:
+            print(f"Watch '{args.id}' not found.")
+
+    elif args.watch_command == "check":
+        triggered = check_watches(state_file)
+        if not triggered:
+            print("No matches found.")
+            return
+        print(f"{len(triggered)} watch(es) triggered:\n")
+        for t in triggered:
+            w = t["watch"]
+            listing = t["listing"]
+            print(f"  [{w['id']}] {w['query']}")
+            print(f"    {listing['title']}")
+            print(f"    ${listing['total_price']:.2f}  (max: ${w['max_price']:.2f})")
+            if listing["url"]:
+                print(f"    {listing['url']}")
+            print()
+
+    else:
+        print("Usage: ebay-agent watch {add,list,remove,check}")
+
+
 def main():
     parser = argparse.ArgumentParser(prog="ebay-agent", description="eBay search and valuation agent")
     subparsers = parser.add_subparsers(dest="command")
@@ -186,6 +252,27 @@ def main():
 
     subparsers.add_parser("prefs", help="Show current preferences")
 
+    p_watch = subparsers.add_parser("watch", help="Manage saved search watches")
+    watch_sub = p_watch.add_subparsers(dest="watch_command")
+
+    _sf_help = "Override state file path (default: ~/.ebay-agent/watches.json)"
+
+    p_watch_add = watch_sub.add_parser("add", help="Add a new watch")
+    p_watch_add.add_argument("query", help="Search query to watch")
+    p_watch_add.add_argument("--max-price", "-p", type=float, required=True, help="Maximum price threshold (USD)")
+    p_watch_add.add_argument("--condition", "-c", default="used", help="Condition filter (default: used)")
+    p_watch_add.add_argument("--state-file", default=None, help=_sf_help)
+
+    p_watch_list = watch_sub.add_parser("list", help="List active watches")
+    p_watch_list.add_argument("--state-file", default=None, help=_sf_help)
+
+    p_watch_rm = watch_sub.add_parser("remove", help="Remove a watch by ID")
+    p_watch_rm.add_argument("id", help="Watch ID to remove")
+    p_watch_rm.add_argument("--state-file", default=None, help=_sf_help)
+
+    p_watch_check = watch_sub.add_parser("check", help="Check all watches against live eBay data")
+    p_watch_check.add_argument("--state-file", default=None, help=_sf_help)
+
     args = parser.parse_args()
 
     if args.command == "search":
@@ -196,6 +283,8 @@ def main():
         cmd_deal(args)
     elif args.command == "prefs":
         cmd_prefs(args)
+    elif args.command == "watch":
+        cmd_watch(args)
     else:
         parser.print_help()
 

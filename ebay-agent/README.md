@@ -22,7 +22,8 @@ ebay-agent/
 │   ├── deal.py           # Deal evaluation (fair range + rating)
 │   ├── relevance.py      # Search relevance filtering (accessory removal)
 │   ├── scoring.py        # Result ranking by price/trust/condition
-│   └── preferences.py    # User preferences
+│   ├── preferences.py    # User preferences
+│   └── watch.py          # Watch state management (saved searches)
 └── references/           # Knowledge packs for the agent
     ├── ebay-api-cheatsheet.md
     ├── ebay-scam-detection.md
