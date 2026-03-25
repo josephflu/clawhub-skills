@@ -11,7 +11,9 @@ import re
 # accessories, not the product itself.  Conservative list to avoid
 # over-filtering.
 ACCESSORY_KEYWORDS: set[str] = {
-    "case",
+    # Keep this list conservative. Generic terms like "case" can cause
+    # false positives for legitimate products that include a bundled case
+    # (e.g. AirPods Pro with charging case).
     "cover",
     "protector",
     "charger",
@@ -37,8 +39,14 @@ ACCESSORY_KEYWORDS: set[str] = {
     "cleaning kit",
     "tempered glass",
     "film",
-    "silicone",
-    "rubber",
+    "silicone case",
+    "hard case",
+    "soft case",
+    "wallet case",
+    "bumper case",
+    "case only",
+    "charging case only",
+    "replacement charging case",
     "replacement battery",
     "dock",
     "stand only",
