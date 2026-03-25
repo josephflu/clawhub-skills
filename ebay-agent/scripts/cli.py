@@ -5,6 +5,7 @@ ebay-agent CLI entry point.
 Usage:
     uv run --project <skill_dir> ebay-agent search "Sony 85mm lens"
     uv run --project <skill_dir> ebay-agent value "iPhone 15 Pro"
+    uv run --project <skill_dir> ebay-agent deal "Sony FE 85mm f/1.8"
     uv run --project <skill_dir> ebay-agent prefs
 """
 
@@ -16,20 +17,27 @@ def cmd_search(args):
     from .search import search_items
     from .preferences import load_preferences
     from .scoring import rank_results
+    from .relevance import filter_relevant
 
     prefs = load_preferences()
     if args.max_price:
         prefs.budget_default = args.max_price
 
     try:
+        # Fetch extra results to compensate for relevance filtering
+        fetch_limit = min(args.limit * 2, 200)
         items = search_items(
             args.query,
             max_price=args.max_price,
             condition=args.condition,
-            limit=args.limit,
+            limit=fetch_limit,
         )
         if not items:
             print("No results found on eBay.")
+            return
+        items = filter_relevant(items, args.query)
+        if not items:
+            print("Results found but all filtered as accessories/irrelevant. Try a more specific query.")
             return
         ranked = rank_results(items, prefs)
         if not ranked:
@@ -91,15 +99,56 @@ def cmd_value(args):
             return
         adj_pct = CONDITION_ADJUSTMENTS.get(args.condition.lower(), 0.8)
         print(f"Valuation for '{args.query}' (condition: {args.condition}):")
-        print(f"  Average:           ${result['avg']:.2f}")
+        print(f"  Fair range:        ${result['fair_low']:.2f} - ${result['fair_high']:.2f}")
         print(f"  Median:            ${result['median']:.2f}")
-        print(f"  Range:             ${result['min']:.2f} - ${result['max']:.2f}")
-        print(f"  Listings analyzed: {result['count']}")
+        print(f"  Confidence:        {result['confidence']}")
+        print(f"  Full range:        ${result['min']:.2f} - ${result['max']:.2f}")
+        print(f"  Listings analyzed: {result['count']} ({result['trimmed_count']} after trimming)")
         print(f"  Source:            {result['source']}")
         print(f"  Condition adj:     {args.condition} ({adj_pct:.0%} of avg = ${result['adjusted_avg']:.2f})")
         print(f"  Recommended price: ${result['recommended_price']:.2f}")
     except Exception as e:
         print(f"Valuation failed: {e}")
+
+
+def cmd_deal(args):
+    from .deal import evaluate_deal
+
+    try:
+        result = evaluate_deal(
+            args.query,
+            condition=args.condition,
+            limit=args.limit,
+            target_price=args.price,
+        )
+        if result["comps_used"] == 0 and result["confidence"] == "low":
+            print(f"Not enough data to evaluate '{args.query}'.")
+            if result["explanation"]:
+                print(f"  {result['explanation']}")
+            return
+        if args.json:
+            print(json.dumps(result, indent=2))
+            return
+
+        print(f"Deal evaluation: {args.query}")
+        print(f"  Fair range:     ${result['fair_low']:.2f} - ${result['fair_high']:.2f}")
+        print(f"  Median:         ${result['median']:.2f}")
+        print(f"  Confidence:     {result['confidence']}")
+        print(f"  Buy below:      ${result['buy_below']:.2f}")
+
+        if args.price is not None:
+            print(f"  Your price:     ${args.price:.2f}")
+            print(f"  Rating:         {result['rating']}")
+
+        print(f"  Why:            {result['explanation']}")
+        print(f"  Source:         {result['source']}")
+
+        if result.get("comp_listings"):
+            print(f"  Top comps:")
+            for i, comp in enumerate(result["comp_listings"], 1):
+                print(f"    {i}. ${comp['price']:.2f} | {comp['condition']} | {comp['title']}")
+    except Exception as e:
+        print(f"Deal evaluation failed: {e}")
 
 
 def cmd_prefs(args):
@@ -128,6 +177,13 @@ def main():
     p_value.add_argument("--limit", "-n", type=int, default=20, help="Listings to analyze (default: 20)")
     p_value.add_argument("--json", action="store_true", help="Output results as JSON")
 
+    p_deal = subparsers.add_parser("deal", help="Evaluate if an item is a good deal")
+    p_deal.add_argument("query", help="Item to evaluate (search query)")
+    p_deal.add_argument("--condition", "-c", default="used", help="Condition (default: used)")
+    p_deal.add_argument("--price", "-p", type=float, default=None, help="Specific price to evaluate")
+    p_deal.add_argument("--limit", "-n", type=int, default=25, help="Comps to analyze (default: 25)")
+    p_deal.add_argument("--json", action="store_true", help="Output results as JSON")
+
     subparsers.add_parser("prefs", help="Show current preferences")
 
     args = parser.parse_args()
@@ -136,6 +192,8 @@ def main():
         cmd_search(args)
     elif args.command == "value":
         cmd_value(args)
+    elif args.command == "deal":
+        cmd_deal(args)
     elif args.command == "prefs":
         cmd_prefs(args)
     else:
